@@ -1,36 +1,38 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\KendaraanController;
+use MongoDB\Client;
 
-/*
-|--------------------------------------------------------------------------
-| Web Routes
-|--------------------------------------------------------------------------
-|
-| Here is where you can register web routes for your application. These
-| routes are loaded by the RouteServiceProvider within a group which
-| contains the "web" middleware group. Now create something great!
-|
-*/
-
-Route::group(['middleware' => ['auth.jwt']], function () {
-    // Route::get('/dashboard', 'DashboardController@index');
-    Route::get('/kendaraans', [KendaraanController::class, 'index']);
-    Route::post('/kendaraans', [KendaraanController::class, 'store']);
-    Route::get('/kendaraans/{id}', [KendaraanController::class, 'show']);
-    Route::put('/kendaraans/{id}', [KendaraanController::class, 'update']);
-    Route::delete('/kendaraans/{id}', [KendaraanController::class, 'destroy']);
+Route::get('/test-mongodb-connection', function () {
+    try {
+        $connection = new Client("mongodb://127.0.0.1:27017");
+        $database = $connection->selectDatabase('kendaraan');
+        $collection = $database->selectCollection('users');
+        $collection->findOne();
+        return "Koneksi MongoDB berhasil!";
+    } catch (\Exception $e) {
+        return "Koneksi MongoDB gagal: " . $e->getMessage();
+    }
 });
 
-
-// Route yang tidak memerlukan autentikasi
 Route::get('/', function () {
     return view('welcome');
 });
 
-// Route yang memerlukan autentikasi menggunakan middleware 'jwt.auth'
-Route::get('/protected', function () {
-    return response()->json(['message' => 'This route requires authentication']);
-})->middleware('jwt.auth');
+Route::get('/dashboard', function () {
+    return view('dashboard');
+})->middleware(['auth'])->name('dashboard');
 
+Route::get('/test', function () {
+    return 'Ini halaman test';
+});
+
+Route::get('/kendaraan', 'App\Http\Controllers\KendaraanController@index');
+
+Route::get('/kendaraan/{id}', 'App\Http\Controllers\KendaraanController@show');
+
+Route::post('/kendaraan', 'App\Http\Controllers\KendaraanController@store')->middleware('auth');
+
+Route::put('/kendaraan/{id}', 'App\Http\Controllers\KendaraanController@update')->middleware('auth');
+
+Route::delete('/kendaraan/{id}', 'App\Http\Controllers\KendaraanController@destroy')->middleware('auth');
