@@ -14,8 +14,23 @@ use App\Http\Controllers\KendaraanController;
 |
 */
 
-Route::get('/kendaraans', [KendaraanController::class, 'index']);
-Route::post('/kendaraans', [KendaraanController::class, 'store']);
-Route::get('/kendaraans/{id}', [KendaraanController::class, 'show']);
-Route::put('/kendaraans/{id}', [KendaraanController::class, 'update']);
-Route::delete('/kendaraans/{id}', [KendaraanController::class, 'destroy']);
+Route::group(['middleware' => ['auth.jwt']], function () {
+    // Route::get('/dashboard', 'DashboardController@index');
+    Route::get('/kendaraans', [KendaraanController::class, 'index']);
+    Route::post('/kendaraans', [KendaraanController::class, 'store']);
+    Route::get('/kendaraans/{id}', [KendaraanController::class, 'show']);
+    Route::put('/kendaraans/{id}', [KendaraanController::class, 'update']);
+    Route::delete('/kendaraans/{id}', [KendaraanController::class, 'destroy']);
+});
+
+
+// Route yang tidak memerlukan autentikasi
+Route::get('/', function () {
+    return view('welcome');
+});
+
+// Route yang memerlukan autentikasi menggunakan middleware 'jwt.auth'
+Route::get('/protected', function () {
+    return response()->json(['message' => 'This route requires authentication']);
+})->middleware('jwt.auth');
+
