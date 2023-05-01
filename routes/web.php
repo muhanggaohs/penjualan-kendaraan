@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\KendaraanController;
 
 /*
 |--------------------------------------------------------------------------
@@ -13,6 +14,8 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::get('/', function () {
-    return view('welcome');
-});
+Route::get('/kendaraans', [KendaraanController::class, 'index']);
+Route::post('/kendaraans', [KendaraanController::class, 'store']);
+Route::get('/kendaraans/{id}', [KendaraanController::class, 'show']);
+Route::put('/kendaraans/{id}', [KendaraanController::class, 'update']);
+Route::delete('/kendaraans/{id}', [KendaraanController::class, 'destroy']);
